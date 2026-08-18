@@ -16,11 +16,12 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Attendance::class);
+
         $attendances = Attendance::query()
             ->with('employee')
             ->when(
-                $request->filled('employee_id'),
-                fn ($query) =>
+                $request->filled('employee_id'), fn ($query) =>
                     $query->where(
                         'employee_id',
                         $request->employee_id
@@ -206,6 +207,8 @@ class AttendanceController extends Controller
 
     public function show(Attendance $attendance)
     {
+        $this->authorize('view', $attendance);
+
         $attendance->load('employee');
 
         return new AttendanceResource($attendance);

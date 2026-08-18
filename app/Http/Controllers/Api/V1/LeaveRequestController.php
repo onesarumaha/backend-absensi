@@ -94,12 +94,6 @@ class LeaveRequestController extends Controller
             ], 422);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Cek tanggal bentrok
-        |--------------------------------------------------------------------------
-        */
-
         $overlap = LeaveRequest::where(
             'employee_id',
             $employee->id
@@ -156,13 +150,10 @@ class LeaveRequestController extends Controller
      */
     public function show(Request $request, LeaveRequest $leaveRequest)
     {
+        $this->authorize('show', $leaveRequest);
         $user = $request->user();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pegawai hanya boleh melihat miliknya sendiri
-        |--------------------------------------------------------------------------
-        */
+      
 
         if (
             $user->isPegawai() &&
@@ -203,6 +194,8 @@ class LeaveRequestController extends Controller
 
     public function approve( ProcessLeaveRequestRequest $request, LeaveRequest $leaveRequest ) 
     {
+        $this->authorize('approve', $leaveRequest);
+
         if ($leaveRequest->status !== 'pending') {
             return response()->json([
                 'message' => 'Pengajuan ini sudah diproses.',
@@ -241,10 +234,10 @@ class LeaveRequestController extends Controller
     /**
      * Admin reject pengajuan.
      */
-    public function reject(
-        ProcessLeaveRequestRequest $request,
-        LeaveRequest $leaveRequest
-    ) {
+    public function reject(ProcessLeaveRequestRequest $request, LeaveRequest $leaveRequest) 
+    {
+        $this->authorize('reject', $leaveRequest);
+
         if ($leaveRequest->status !== 'pending') {
             return response()->json([
                 'message' =>
