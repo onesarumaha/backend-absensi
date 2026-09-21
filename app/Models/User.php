@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -23,6 +24,17 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    protected $appends = ['photo_url'];
+
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'photo',                 
+        'photo_verified_at',     
+    ];
 
     protected function casts(): array
     {
@@ -53,5 +65,10 @@ class User extends Authenticatable
     public function isPegawai(): bool
     {
         return $this->role === 'pegawai';
+    }
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? asset('storage/' . $this->photo) : null;
     }
 }

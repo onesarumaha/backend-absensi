@@ -35,6 +35,15 @@ class AttendanceResource extends JsonResource
                 'latitude' => $this->check_out_latitude,
                 'longitude' => $this->check_out_longitude,
             ],
+            'check_in_photo' => $this->check_in_photo
+                ? asset('storage/' . $this->check_in_photo)
+                : null,
+
+            'check_out_latitude' => $this->check_out_latitude,
+            'check_out_longitude' => $this->check_out_longitude,
+            'check_out_photo' => $this->check_out_photo
+                ? asset('storage/' . $this->check_out_photo)
+                : null,
 
             'notes' => $this->notes,
 

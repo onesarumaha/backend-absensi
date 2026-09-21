@@ -19,6 +19,8 @@ class Attendance extends Model
         'check_out_latitude',
         'check_out_longitude',
         'notes',
+        'check_out_photo',
+        'check_in_photo'
     ];
 
     protected function casts(): array

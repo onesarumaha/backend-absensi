@@ -44,6 +44,38 @@ class UpdateWorkScheduleRequest extends FormRequest
                 'date_format:H:i',
                 'after:start_time',
             ],
+            'late_tolerance' => [
+                'sometimes',
+                'integer',
+                'min:0',
+                'max:120',
+            ],
+
+            'latitude' => [
+                'nullable',
+                'numeric',
+                'between:-90,90',
+            ],
+
+            'longitude' => [
+                'nullable',
+                'numeric',
+                'between:-180,180',
+            ],
+
+            'radius_meters' => [
+                'sometimes',
+                'integer',
+                'min:10',
+                'max:10000',
+            ],
+
+            'location_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
         ];
     }
 }

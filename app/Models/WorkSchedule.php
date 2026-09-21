@@ -11,15 +11,19 @@ class WorkSchedule extends Model
         'name',
         'start_time',
         'end_time',
+        'late_tolerance',
+        'latitude',
+        'longitude',
+        'radius_meters',
+        'location_name',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'string',
-            'end_time' => 'string',
-        ];
-    }
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'radius_meters' => 'integer',
+        'late_tolerance' => 'integer',
+    ];
 
     public function employees(): HasMany
     {

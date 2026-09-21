@@ -179,17 +179,73 @@ class LeaveRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, LeaveRequest $leaveRequest)
     {
-        //
+        $employee = $request->user()->employee;
+
+        if (! $employee) {
+            return response()->json([
+                'message' => 'User belum terhubung dengan data pegawai.',
+            ], 422);
+        }
+
+        if ($leaveRequest->employee_id !== $employee->id) {
+            return response()->json([
+                'message' => 'Anda tidak berhak mengubah pengajuan ini.',
+            ], 403);
+        }
+
+        if ($leaveRequest->status !== 'pending') {
+            return response()->json([
+                'message' => 'Pengajuan yang sudah diproses tidak dapat diubah.',
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'type' => [
+                'required',
+                \Illuminate\Validation\Rule::in(['izin', 'sakit', 'cuti']),
+            ],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'reason' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $overlap = LeaveRequest::where('employee_id', $employee->id)
+            ->where('id', '!=', $leaveRequest->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->whereDate('start_date', '<=', $validated['end_date'])
+            ->whereDate('end_date', '>=', $validated['start_date'])
+            ->exists();
+
+        if ($overlap) {
+            return response()->json([
+                'message' => 'Tanggal pengajuan bertabrakan dengan pengajuan sebelumnya.',
+            ], 422);
+        }
+
+        $leaveRequest->update($validated);
+
+        $leaveRequest->load([
+            'employee',
+            'approvedBy',
+        ]);
+
+        return new LeaveRequestResource($leaveRequest);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(LeaveRequest $leaveRequest)
     {
-        //
+        DB::transaction(function () use ($leaveRequest) {
+            $leaveRequest->delete();
+        });
+
+        return response()->json([
+            'message' => 'Cuti berhasil dihapus.',
+        ]);
     }
 
     public function approve( ProcessLeaveRequestRequest $request, LeaveRequest $leaveRequest ) 
