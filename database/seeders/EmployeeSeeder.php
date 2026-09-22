@@ -35,7 +35,7 @@ class EmployeeSeeder extends Seeder
                 'position_id' => Position::first()?->id,
                 'work_schedule_id' => WorkSchedule::first()?->id,
                 'join_date' => now()->toDateString(),
-                'status' => 'aktif',
+                'status' => 'active',
             ]
         );
 
