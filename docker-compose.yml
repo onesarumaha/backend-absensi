@@ -1,0 +1,48 @@
+services:
+  app:
+    image: ghcr.io/onesarumaha/backend-absensi:latest
+    container_name: absensi-app
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./.env:/var/www/html/.env
+    depends_on:
+      - db
+    networks:
+      - absensi-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: absensi-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/html/public
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - absensi-net
+
+  db:
+    image: mysql:8.0
+    container_name: absensi-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - absensi-net
+
+volumes:
+  db-data:
+
+networks:
+  absensi-net:
+    driver: bridge
