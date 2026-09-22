@@ -4,6 +4,8 @@ services:
     container_name: absensi-app
     restart: always
     working_dir: /var/www/html
+    environment:
+      - TMPDIR=/var/www/html/storage/tmp    
     volumes:
       - ./storage:/var/www/html/storage
       - ./.env:/var/www/html/.env
@@ -17,7 +19,7 @@ services:
     container_name: absensi-nginx
     restart: always
     ports:
-      - "8085:80"    # ← dari "80:80" ke "8085:80"
+      - "8085:80"    
     volumes:
       - ./public:/var/www/html/public
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
