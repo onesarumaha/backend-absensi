@@ -47,7 +47,12 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin main
-            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            cd public
+            unlink storage 2>/dev/null || true
+            ln -sf ../storage/app/public storage
+            cd ..
+
             docker compose pull
             docker compose up -d
             docker compose exec -T -u root app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
